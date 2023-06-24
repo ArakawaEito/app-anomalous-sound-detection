@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  api:
+    container_name: flaskapi
+    restart: always
+    build: ./flaskapi
+    ports:
+      - "8000:8000"
+    networks:
+      - shared-nw
+
+  flasknginx:
+    container_name: flasknginx
+    restart: always
+    build: ./flask_nginx
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+    networks:
+      - shared-nw
+    # tty: true
+
+  streamlit:
+    container_name: streamlit
+    restart: always
+    build: ./streamlit
+    ports:
+      - "8501:8501"    
+    command: streamlit run app.py
+    networks:
+      - shared-nw
+
+  streamlitnginx:
+    container_name: streamlitnginx
+    restart: always
+    build: ./streamlit_nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - streamlit
+    networks:
+      - shared-nw
+networks:
+  shared-nw:
+    driver: bridge
